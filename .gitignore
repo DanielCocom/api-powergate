@@ -1,0 +1,117 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.pdb
+*.pidb
+*.vsscc
+*.vssscc
+*.vspscc
+*.vsl
+*.obj
+*.master
+*.resharper
+*.dbmdl
+*.jfm
+*.pfx
+*.snk
+*.orig
+# Visual Studio 2017+ local .NET Core assets
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+*.exe
+*.dll
+*.so
+*.dylib
+*.log
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+*.nupkg
+*.bak
+*.temp
+*.tmp
+*.vsix
+*.vsixmanifest
+*.woff
+*.woff2
+*.ttf
+*.eot
+*.svg
+*.map
+*.swp
+
+# NuGet packages
+packages/
+*.nupkg
+.nuget/
+NuGet.exe
+NuGet.config
+# If you keep packages in a separate directory
+# e.g. packages/
+# uncomment the following line:
+#**/packages/*
+
+# Other temporary files
+*~
+*.lock
+*.orig
+*.swp
+*.bak
+*.swo
+
+# Test Results
+TestResults/
+*.trx
+*.coverage
+*.vsmdi
+*.localtestrunconfig
+
+# Database files
+*.mdf
+*.ldf
+*.sdf
+*.db
+*.sqlite
+*.sqlproj.user
+
+# Publish Files
+publish/
+*/publish/
+
+# User Secrets
+appsettings.Development.json # O cualquier otro archivo de configuración con secretos
+appsettings.json.user
+appsettings.*.user
+*.user.json
+
+# Environment variables / API keys
+*.env
+.env
+.env.*
+
+# Serilog
+serilog-*.txt
+
+# Specific to .NET Core / .NET 8
+# Runtime-specific assets
+bin/
+obj/
+
+# User secrets (handled by dotnet user-secrets command)
+# Not strictly necessary if using appsettings.json.user pattern but good to have.
+UserSecrets/
+
+# Any local settings file
+LocalSettings.json
+
