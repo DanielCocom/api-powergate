@@ -90,7 +90,7 @@ publish/
 */publish/
 
 # User Secrets
-appsettings.Development.json # O cualquier otro archivo de configuración con secretos
+appsettings.Development.json 
 appsettings.json.user
 appsettings.*.user
 *.user.json

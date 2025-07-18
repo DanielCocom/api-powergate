@@ -1,4 +1,5 @@
 using api_powergate.Infrastructure.Data;
+using api_powergate.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,19 +11,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
-
-
-builder.Services.AddDbContext<ApiPowergateContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(9, 3, 0))
-    )
-);
-
-
-
 
 
 // Configure the HTTP request pipeline.
