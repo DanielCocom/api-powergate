@@ -1,6 +1,6 @@
 ﻿using api_powergate.Aplication.Dtos;
 using api_powergate.Aplication.Services;
-
+using api_powergate.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
@@ -9,9 +9,9 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class LecturasController : ControllerBase
 {
-    private readonly LecturaService _lecturaService;
+    private readonly ILecturaService _lecturaService;
 
-    public LecturasController(LecturaService lecturaService)
+    public LecturasController(ILecturaService lecturaService)
     {
         _lecturaService = lecturaService;
     }
@@ -19,7 +19,15 @@ public class LecturasController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Registrar([FromBody] RegistrarLecturaDto dto)
     {
-        var id = await _lecturaService.RegistrarLecturaAsync(dto);
-        return Ok(new { id });
+        var response = await _lecturaService.RegistrarLectura(dto);
+
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+        else
+        {
+            return BadRequest(response);
+        }
     }
 }
