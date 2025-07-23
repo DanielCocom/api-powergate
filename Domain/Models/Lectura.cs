@@ -15,7 +15,7 @@ public partial class Lectura
     public long Id { get; set; }
 
     [Column("canal_id")]
-    public int? CanalId { get; set; }
+    public int CanalId { get; set; }
 
     [Column("timestamp", TypeName = "datetime")]
     public DateTime? Timestamp { get; set; }

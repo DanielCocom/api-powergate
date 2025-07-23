@@ -22,11 +22,14 @@ namespace api_powergate.Infrastructure.DependencyInjection
             // Repositorios
             services.AddScoped<ILecturaRepository, LecturaRepository>();
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+            services.AddScoped<IDispositivoRepository, DispositivoRepository>();
+
 
             services.AddScoped<ICanalDeCargaRepository, CanalDeCargaRepository>();
 
             // Servicios de aplicación
             services.AddTransient<ILecturaService,LecturaService>();
+            services.AddTransient<IDispositivoService, DispositivoService>();
             services.AddTransient<AuthService>();
 
             return services;
