@@ -3,7 +3,6 @@ using api_powergate.Aplication.Dtos.Usuario;
 using api_powergate.Common;
 using api_powergate.Domain.Interfaces;
 using api_powergate.Domain.Models;
-using BCrypt.Net; // Importa la librería de bcrypt
 
 public class AuthService
 {
@@ -17,49 +16,49 @@ public class AuthService
     public async Task<Response<UsuarioDto>> RegistrarUsuario(AuthDtos.RegisterRequest registerRequest)
     {
         var response = new Response<UsuarioDto>();
+
         try
         {
+            // Validar si ya existe el correo
             var usuarioExiste = await _usuarioRepository.GetUsuarioPorCorreo(registerRequest.correo);
             if (usuarioExiste != null)
             {
                 response.IsSuccess = false;
-                response.Message = "El correo ya esta registrado";
+                response.Message = "El correo ya está registrado.";
                 return response;
             }
 
-            // Aquí se usa bcrypt para generar el hash
+            // Encriptar contraseña
             var contrasenaHash = HashPassword(registerRequest.contrasena);
 
-            var usuario = new Usuario()
+            var nuevoUsuario = new Usuario
             {
                 Nombre = "Default",
                 Correo = registerRequest.correo,
                 ClaveHash = contrasenaHash,
-                FechaRegistro = DateTime.Now
+                FechaRegistro = DateTime.UtcNow
             };
 
-            var guardaUsuario = await _usuarioRepository.AddUsuario(usuario);
+            var guardado = await _usuarioRepository.AddUsuario(nuevoUsuario);
 
-            if (guardaUsuario)
+            if (!guardado)
             {
-                response.Data = null;
-                response.IsSuccess = true;
-                response.Message = "Se ha registrado el usuario con éxito";
+                response.IsSuccess = false;
+                response.Message = "No se pudo registrar el usuario. Intenta más tarde.";
                 return response;
             }
 
-            response.IsSuccess = false;
-            response.Message = "No se pudo registrar, intentalo más tarde";
-            response.Data = null;
-
+            response.IsSuccess = true;
+            response.Message = "Usuario registrado con éxito.";
+            response.Data = new UsuarioDto { correo = nuevoUsuario.Correo };
+            return response;
         }
-        catch (Exception exe)
+        catch (Exception ex)
         {
             response.IsSuccess = false;
-            response.Message = exe.Message;
+            response.Message = $"Error interno: {ex.Message}";
+            return response;
         }
-
-        return response;
     }
 
     public async Task<Response<UsuarioDto>> LoginUsuario(AuthDtos.LoginRequest loginRequest)
@@ -73,47 +72,39 @@ public class AuthService
             if (usuario == null)
             {
                 response.IsSuccess = false;
-                response.Message = "El correo no se ha registrado";
-                response.Data = null;
+                response.Message = "El correo no está registrado.";
                 return response;
             }
 
-          
-            var verificarContrasena = VerifyPassword(loginRequest.contrasena, usuario.ClaveHash);
+            var credencialesValidas = VerifyPassword(loginRequest.contrasena, usuario.ClaveHash);
 
-            if (verificarContrasena)
+            if (!credencialesValidas)
             {
-                response.Data = new UsuarioDto { corroe = loginRequest.correo };
-                response.IsSuccess = true;
-                response.Message = "Inicio de sesión exitoso";
+                response.IsSuccess = false;
+                response.Message = "La contraseña es incorrecta.";
                 return response;
             }
 
-            response.Data = null;
-            response.IsSuccess = false;
-            response.Message = "No se pudo registrar al usuario";
-
+            response.IsSuccess = true;
+            response.Message = "Inicio de sesión exitoso.";
+            response.Data = new UsuarioDto { correo = usuario.Correo };
+            return response;
         }
-        catch (Exception exe)
+        catch (Exception ex)
         {
             response.IsSuccess = false;
-            response.Message = exe.Message;
-            response.Data = null;
+            response.Message = $"Error al iniciar sesión: {ex.Message}";
+            return response;
         }
-        return response;
     }
 
-  
     private string HashPassword(string password)
     {
-       
         return BCrypt.Net.BCrypt.HashPassword(password);
     }
 
- 
     private bool VerifyPassword(string password, string storedHash)
     {
-       
         return BCrypt.Net.BCrypt.Verify(password, storedHash);
     }
 }

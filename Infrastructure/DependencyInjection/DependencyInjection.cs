@@ -11,13 +11,25 @@ namespace api_powergate.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            // Configurar EF Core
+            var connectionString = configuration.GetConnectionString("ApiPowergateDbConnection");
+            Console.WriteLine($"Cadena de conexión utilizada: {connectionString}");
+
             services.AddDbContext<ApiPowergateContext>(options =>
                 options.UseMySql(
-                    configuration.GetConnectionString("DefaultConnection"),
+                    connectionString,
                     new MySqlServerVersion(new Version(9, 3, 0))
                 )
             );
+            services.AddCors(options =>
+            {
+                options.AddPolicy("PermitirTodo", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
 
             // Repositorios
             services.AddScoped<ILecturaRepository, LecturaRepository>();

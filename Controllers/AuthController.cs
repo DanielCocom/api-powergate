@@ -4,6 +4,9 @@ using api_powergate.Aplication.Dtos;
 
 namespace api_powergate.Controllers
 {
+
+    [ApiController]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;

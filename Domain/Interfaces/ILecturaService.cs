@@ -7,5 +7,7 @@ namespace api_powergate.Domain.Interfaces
     public interface ILecturaService
     {
         Task<Response<bool>> RegistrarLectura(RegistrarLecturaDto lectura);
+        Task<Response<List<RegistrarLecturaDto>>> ObtenerLecturasPorDispositivoAsync(int dispositivoId);
+        
     }
 }

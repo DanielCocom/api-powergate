@@ -2,6 +2,6 @@
 {
     public class UsuarioDto
     {
-        public string corroe { get; set; }
+        public string correo { get; set; }
     }
 }

@@ -16,11 +16,24 @@ public class LecturasController : ControllerBase
         _lecturaService = lecturaService;
     }
 
-    [HttpPost]
+    [HttpPost("EnviarLectura")]
     public async Task<IActionResult> Registrar([FromBody] RegistrarLecturaDto dto)
     {
         var response = await _lecturaService.RegistrarLectura(dto);
 
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+        else
+        {
+            return BadRequest(response);
+        }
+    }
+    [HttpGet]
+    public async Task<IActionResult> ObtenerLecturasPorDispositivoAsync(int dispositivoId)
+    {
+        var response = await _lecturaService.ObtenerLecturasPorDispositivoAsync(dispositivoId);
         if (response.IsSuccess)
         {
             return Ok(response);

@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api_powergate.Controllers
 {
+
+    [ApiController]
+    [Route("api/[controller]")]
     public class DispositivoController : ControllerBase
     {
         private readonly IDispositivoService _service;
@@ -11,7 +14,7 @@ namespace api_powergate.Controllers
         {
             _service = service;
         }
-        [HttpGet("estado/{dispositivoId:int}")]
+        [HttpGet("{dispositivoId:int}/estado")]
         public async Task<IActionResult> ObtenerEstado(int dispositivoId)
         {
             var response = await _service.ObtenerEstado(dispositivoId);
