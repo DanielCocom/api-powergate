@@ -54,14 +54,26 @@ Consulta el estado actual de un dispositivo.
 **Respuesta esperada:**
 ```json
 {
-  "data": {
-    "dispositivoId": 1,
-    "nombre": "nodo_1",
-    "ubicacion": "Edificio A",
-    "estado": "Activo"
-  },
-  "isSuccess": true,
-  "message": "Estado obtenido correctamente."
+  "dispositivoId": 1,
+  "nombre": "dispositivo-1",
+  "ubicacion": "Planta Baja - Sala",
+  "potenciaTotal": 305.1,
+  "energiaTotalSesion": 2.35,
+  "tienePresencia": true,
+  "canales": [
+    {
+      "canalId": 1,
+      "nombre": "Canal A1",
+      "potencia": 184.3,
+      "releActivo": true
+    },
+    {
+      "canalId": 2,
+      "nombre": "Canal A2",
+      "potencia": 120.8,
+      "releActivo": false
+    }
+  ]
 }
 ```
 
