@@ -35,9 +35,11 @@ Registra un nuevo usuario.
 **Respuesta esperada:**
 ```json
 {
-  "data": null,
+  "data": {
+    "correo": "example@gmail.com"
+  },
   "isSuccess": true,
-  "message": "Se ha registrado el usuario con éxito."
+  "message": "Usuario registrado con éxito."
 }
 ```
 
