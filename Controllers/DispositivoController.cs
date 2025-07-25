@@ -20,11 +20,11 @@ namespace api_powergate.Controllers
             var response = await _service.ObtenerEstado(dispositivoId);
             if (response.IsSuccess)
             {
-                return Ok(response.Data);
+                return Ok(response);
             }
             else
             {
-                return NotFound(response.Message);
+                return NotFound(response);
             }
         }
 
