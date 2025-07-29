@@ -29,20 +29,30 @@ namespace api_powergate.Aplication.Services
             try
             {
                 var canal = await _canalRepo.GetById(dto.CanalId);
-                if (canal == null || canal.Habilitado == false)
+                if (canal == null)
                     throw new Exception("Canal no válido o está deshabilitado.");
+
+                // si esta activo no deja pasar la energia
+                canal = await _canalRepo.GetById(dto.CanalId);
+                if (dto.ReleActivo)
+                {
+                    canal.Habilitado = false; 
+                }
+                else
+                {
+                    canal.Habilitado = true; 
+                }
+                await _context.SaveChangesAsync();
 
 
                 // VALIDAR ANTES DE CREAR EL OBJETO
                 var lectura = new Lectura
                 {
                     CanalId = dto.CanalId,
-                    Timestamp = dto.Timestamp,
+                    Timestamp = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time (Mexico)")), // Asignar la fecha y hora actual en UTC
                     Voltaje = dto.Voltaje,
                     Corriente = dto.Corriente,
                     Potencia = dto.Potencia,
-                    EnergiaSesion = dto.EnergiaSesion,
-                    Presencia = dto.Presencia,
                     ReleActivo = dto.ReleActivo
                 };
 
@@ -61,7 +71,7 @@ namespace api_powergate.Aplication.Services
                 response.Message = ex.Message;
                 return response;
             }
-            // TODO (opcional): iniciar/cerrar sesión de uso
+            
         }
 
         public async Task<Response<List<RegistrarLecturaDto>>> ObtenerLecturasPorDispositivoAsync(int dispositivoId)
@@ -86,12 +96,9 @@ namespace api_powergate.Aplication.Services
                     .Select(l => new RegistrarLecturaDto
                     {
                         CanalId = l.CanalId,
-                        Timestamp = l.Timestamp ?? DateTime.MinValue,
                         Voltaje = l.Voltaje ?? 0,
                         Corriente = l.Corriente ?? 0,
                         Potencia = l.Potencia ?? 0,
-                        EnergiaSesion = l.EnergiaSesion ?? 0,
-                        Presencia = l.Presencia ?? false,
                         ReleActivo = l.ReleActivo ?? false
                     })
                     .ToListAsync();
