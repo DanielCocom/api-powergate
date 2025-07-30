@@ -1,6 +1,8 @@
 ﻿using api_powergate.Aplication.Services;
 using api_powergate.Domain.Interfaces;
+using api_powergate.Domain.Interfaces.ws;
 using api_powergate.Infrastructure.Data;
+using api_powergate.Infrastructure.Realtime;
 using api_powergate.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -47,6 +49,15 @@ namespace api_powergate.Infrastructure.DependencyInjection
             services.AddTransient<ILecturaService, LecturaService>();
             services.AddTransient<IDispositivoService, DispositivoService>();
             services.AddTransient<AuthService>();
+
+
+            // Realtime
+            services.AddSignalR();
+            services.AddSingleton<IDeviceConnectionTracker, InMemoryDeviceConnectionTracker>();
+            services.AddScoped<IRelayCommander, SignalRRelayCommander>();
+
+            // Services de application
+            services.AddScoped<CanalCargaService>();
 
             return services;
         }

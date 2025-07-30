@@ -1,5 +1,6 @@
 using api_powergate.Infrastructure.Data;
 using api_powergate.Infrastructure.DependencyInjection;
+using api_powergate.Infrastructure.Realtime;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,5 +42,5 @@ app.UseAuthorization();
 app.UseCors("Politicas");
 
 app.MapControllers();
-
+app.MapHub<DeviceHub>("/ws/deviceHub");
 app.Run();

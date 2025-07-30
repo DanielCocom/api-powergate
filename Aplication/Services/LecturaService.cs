@@ -160,40 +160,9 @@ namespace api_powergate.Aplication.Services
             }
         }
 
-        public async Task<Response<List<CanalCargaEstadoDto>>> GetEstadoRele(int id_dispositivo)
+        public Task<Response<List<CanalCargaEstadoDto>>> GetEstadoRele(int dispositivoId)
         {
-            Response<List<CanalCargaEstadoDto>> response = new Response<List<CanalCargaEstadoDto>>();
-
-            try
-            {
-                var canal = await _context.CanalDeCargas
-                   .Where(c => c.DispositivoId == id_dispositivo)
-                   .Select(c => new CanalCargaEstadoDto
-                   {
-                       Nombre = c.Nombre,
-                       ReleActivo = c.Habilitado ?? false // Asumimos que Habilitado indica si el rele está activo
-                   })
-                   .ToListAsync();
-
-                if (canal == null)
-                {
-                    response.IsSuccess = false;
-                    response.Message = "No se encontró el canal de carga.";
-                    return response;
-                }
-
-                response.Data = canal;
-                response.IsSuccess = true;
-                response.Message = "Estado del rele obtenido correctamente.";
-                return response;
-            }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.Message = $"Error al obtener el estado del rele: {ex.Message}";
-                return response;
-            }
-
+            throw new NotImplementedException();
         }
     }
 }

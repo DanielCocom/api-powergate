@@ -80,17 +80,17 @@ namespace api_powergate.Aplication.Services
                     PotenciaTotal = potenciaTotal,
                     EnergiaTotalSesion = energiaTotalSesion,
                     TienePresencia = tienePresencia,
+
                     Canales = dispositivo.CanalDeCargas.Select(c =>
                     {
-                        var lecturaAsociada = lecturasUltimasPorCanal.FirstOrDefault(l => l.CanalId == c.Id);
                         return new CanalEstadoDto
                         {
                             CanalId = c.Id,
                             Nombre = c.Nombre ?? "",
-                            Potencia = lecturaAsociada?.Potencia ?? 0, 
-                            ReleActivo = lecturaAsociada?.ReleActivo == true 
+                            ReleActivo = c.Habilitado  
                         };
                     }).ToList()
+                  
                 };
 
                 response.IsSuccess = true;

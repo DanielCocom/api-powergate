@@ -15,7 +15,7 @@ public partial class CanalDeCarga
     public int Id { get; set; }
 
     [Column("dispositivo_id")]
-    public int? DispositivoId { get; set; }
+    public int DispositivoId { get; set; }
 
     [Column("nombre")]
     [StringLength(50)]
