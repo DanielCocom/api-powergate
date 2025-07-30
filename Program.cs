@@ -37,8 +37,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-// Aplicar la política de CORS
-app.UseCors("CorsPolicy");
+// Aplicar la polÃ­tica de CORS
+app.UseCors("Politicas");
 
 app.MapControllers();
 
