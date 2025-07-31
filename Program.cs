@@ -5,6 +5,7 @@ using api_powergate.Infrastructure.DependencyInjection;
 using api_powergate.Infrastructure.Realtime;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Net.WebSockets;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +70,26 @@ app.Use(async (context, next) =>
         var webSocket = await context.WebSockets.AcceptWebSocketAsync();
         var manager = context.RequestServices.GetRequiredService<Esp32WebSocketManager>();
         await manager.HandleConnectionAsync(webSocket, deviceId);
+    }
+    else if (context.Request.Path == "/ws/web" && context.WebSockets.IsWebSocketRequest)
+    {
+        var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+        var manager = context.RequestServices.GetRequiredService<api_powergate.Infrastructure.Realtime.WebSocketManager>();
+
+        // Manejar suscripción
+        var deviceId = context.Request.Query["deviceId"];
+        manager.Subscribe(deviceId, webSocket);
+
+        // Mantener conexión abierta
+        var buffer = new byte[1024];
+        while (webSocket.State == WebSocketState.Open)
+        {
+            await webSocket.ReceiveAsync(
+                new ArraySegment<byte>(buffer),
+                CancellationToken.None);
+        }
+
+        manager.Unsubscribe(deviceId, webSocket);
     }
     else
     {

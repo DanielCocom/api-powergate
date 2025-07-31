@@ -7,6 +7,7 @@ using api_powergate.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
+using WebSocketManager = api_powergate.Infrastructure.Realtime.WebSocketManager;
 
 namespace api_powergate.Infrastructure.DependencyInjection
 {
@@ -45,6 +46,7 @@ namespace api_powergate.Infrastructure.DependencyInjection
             services.AddScoped<IDispositivoRepository, DispositivoRepository>();
             services.AddScoped<ICanalDeCargaRepository, CanalDeCargaRepository>();
             services.AddSingleton<Esp32WebSocketManager>();
+            services.AddSingleton<WebSocketManager>();
             services.AddSingleton<IRelayCommander, HybridRelayCommander>();
 
             // Servicios de aplicación
