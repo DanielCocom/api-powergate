@@ -16,14 +16,22 @@ namespace api_powergate.Infrastructure.Realtime
             var deviceId = Context.GetHttpContext().Request.Query["deviceId"];
             Console.WriteLine($"Conexión establecida: deviceId={deviceId}, connectionId={Context.ConnectionId}");
 
-            if (int.TryParse(deviceId, out var id))
+            try
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, DeviceGroup(id));
-                await _tracker.MarkConnectedAsync(id, Context.ConnectionId);
+                if (int.TryParse(deviceId, out var id))
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, DeviceGroup(id));
+                    await _tracker.MarkConnectedAsync(id, Context.ConnectionId);
+                }
+                else
+                {
+                    throw new ArgumentException("deviceId no es válido.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                throw new ArgumentException("deviceId no es válido.");
+                Console.WriteLine($"Error al conectar: {ex.Message}");
+                // Manejo adicional de la excepción si es necesario
             }
 
             await base.OnConnectedAsync();
