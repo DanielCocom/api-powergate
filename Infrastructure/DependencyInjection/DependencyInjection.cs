@@ -44,6 +44,8 @@ namespace api_powergate.Infrastructure.DependencyInjection
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
             services.AddScoped<IDispositivoRepository, DispositivoRepository>();
             services.AddScoped<ICanalDeCargaRepository, CanalDeCargaRepository>();
+            services.AddSingleton<Esp32WebSocketManager>();
+            services.AddSingleton<IRelayCommander, HybridRelayCommander>();
 
             // Servicios de aplicación
             services.AddTransient<ILecturaService, LecturaService>();
@@ -53,8 +55,8 @@ namespace api_powergate.Infrastructure.DependencyInjection
 
             // Realtime
             services.AddSignalR();
-            services.AddSingleton<IDeviceConnectionTracker, InMemoryDeviceConnectionTracker>();
-            services.AddScoped<IRelayCommander, SignalRRelayCommander>();
+            services.AddSingleton<IDeviceConnectionTracker, Esp32WebSocketManager>();
+            services.AddScoped<IRelayCommander, WebSocketRelayCommander>();
 
             // Services de application
             services.AddScoped<CanalCargaService>();

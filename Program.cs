@@ -51,6 +51,32 @@ app.UseCors("AllowSpecificOrigins"); // ¡Asegúrate de usar el nombre de la pol
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHub<DeviceHub>("/ws/deviceHub");
+
+app.UseWebSockets(); // Habilita WebSockets
+
+// Configura el endpoint para ESP32
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/ws/esp32" && context.WebSockets.IsWebSocketRequest)
+    {
+        var deviceId = context.Request.Query["deviceId"];
+        if (string.IsNullOrEmpty(deviceId))
+        {
+            context.Response.StatusCode = 400;
+            return;
+        }
+
+        var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+        var manager = context.RequestServices.GetRequiredService<Esp32WebSocketManager>();
+        await manager.HandleConnectionAsync(webSocket, deviceId);
+    }
+    else
+    {
+        await next();
+    }
+});
+
+
+
 app.MapControllers();
 app.Run();

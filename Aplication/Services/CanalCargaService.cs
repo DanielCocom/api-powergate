@@ -3,6 +3,7 @@ using api_powergate.Common;
 using api_powergate.Domain.Interfaces;
 using api_powergate.Domain.Interfaces.ws;
 using api_powergate.Infrastructure.Data;
+using api_powergate.Infrastructure.Realtime;
 using Microsoft.EntityFrameworkCore;
 
 namespace api_powergate.Aplication.Services
@@ -12,11 +13,13 @@ namespace api_powergate.Aplication.Services
         private readonly ApiPowergateContext _context;
         private IDeviceConnectionTracker _connTracker;
         private IRelayCommander _relayCommander;
-        public CanalCargaService(ApiPowergateContext apiPowergateContext, IRelayCommander relayCommander, IDeviceConnectionTracker connTracker)
+        private readonly Esp32WebSocketManager _wsManager;
+        public CanalCargaService(ApiPowergateContext apiPowergateContext, IRelayCommander relayCommander, IDeviceConnectionTracker connTracker, Esp32WebSocketManager esp32WebSocketManager)
         {
             _context = apiPowergateContext ?? throw new ArgumentNullException(nameof(apiPowergateContext));
             _relayCommander = relayCommander;
             _connTracker = connTracker ?? throw new ArgumentNullException(nameof(connTracker));
+            _wsManager = esp32WebSocketManager ?? throw new ArgumentNullException(nameof(esp32WebSocketManager));
         }
         public async Task<Response<List<CanalEstadoDto>>> GetEstadoRele(int id_dispositivo)
         {
@@ -57,50 +60,64 @@ namespace api_powergate.Aplication.Services
 
         public async Task<Response<CanalEstadoDto>> CambiarEstadoRele(int canalId, bool estado)
         {
-            Response<CanalEstadoDto> response = new Response<CanalEstadoDto>();
+            Response<CanalEstadoDto> response = new();
             try
             {
-                var canal = await _context.CanalDeCargas.FindAsync(canalId);
-                if (canal == null)
+                var canal = await _context.CanalDeCargas
+                    .Include(c => c.Dispositivo)
+                    .FirstOrDefaultAsync(c => c.Id == canalId);
+
+                if (canal?.Dispositivo == null)
                 {
                     response.Data = null;
                     response.IsSuccess = false;
-                    response.Message = "Canal no encontrado.";
+                    response.Message = canal == null ? "Canal no encontrado." : "Dispositivo asociado no encontrado.";
                     return response;
                 }
 
+                // Actualizar estado en base de datos
                 canal.Habilitado = estado;
                 await _context.SaveChangesAsync();
 
-                int dispositivoId = canal.DispositivoId;
+                var commandId = Guid.NewGuid().ToString("N");
+                var dispositivoId = canal.DispositivoId;
+                var online = await _wsManager.IsOnlineAsync(dispositivoId);
 
-                var online = await _connTracker.IsOnlineAsync(dispositivoId);
-
-               var commandId = Guid.NewGuid().ToString("N");
-                if (online) 
+                if (online)
                 {
-                    await _relayCommander.SendToggleAsync(canal.DispositivoId, canal.Id, estado, Guid.NewGuid().ToString());
+                    await _relayCommander.SendToggleAsync(
+                        dispositivoId,
+                        canal.Id,
+                        estado,
+                        commandId);
 
+                    // Registrar comando
+
+
+                    await _context.SaveChangesAsync();
                 }
+
                 response.Data = new CanalEstadoDto
                 {
                     CanalId = canal.Id,
                     Nombre = canal.Nombre,
-                    ReleActivo = canal.Habilitado
+                    ReleActivo = canal.Habilitado,
                 };
 
                 response.IsSuccess = true;
-                response.Message = "Estado del rele actualizado correctamente.";
+                response.Message = online
+                    ? "Estado del relé actualizado y comando enviado al dispositivo."
+                    : "Estado del relé actualizado (dispositivo offline).";
+
                 return response;
             }
             catch (Exception ex)
             {
                 response.IsSuccess = false;
-                response.Message = $"Error al cambiar el estado del rele: {ex.Message}";
+                response.Message = $"Error al cambiar el estado del relé: {ex.Message}";
                 return response;
             }
         }
-
 
     }
 }
