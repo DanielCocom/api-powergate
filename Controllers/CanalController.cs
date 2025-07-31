@@ -5,22 +5,30 @@ namespace api_powergate.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CanalesController : ControllerBase
+    public class CanalController : ControllerBase
     {
         private readonly CanalCargaService _canalService;
-        public CanalesController(CanalCargaService canalService) => _canalService = canalService;
+        public CanalController(CanalCargaService canalService) => _canalService = canalService;
 
-        [HttpPost("{canalId}/rele")]
-        public async Task<IActionResult> Toggle(int canalId, [FromBody] ToggleRelayRequest dto)
+        [HttpPost("rele")]
+        public async Task<IActionResult> Toggle([FromBody] ToggleRelayRequest dto)
         {
-            var result = await _canalService.CambiarEstadoRele(canalId, dto.ReleActivo);
+            var result = await _canalService.CambiarEstadoRele(dto.CanalId, dto.ReleActivo);
             if (!result.IsSuccess) return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpGet("{dispositivoId:int}/estado")]
+        public async Task<IActionResult> GetEstadoRele(int dispositivoId)
+        {
+            var result = await _canalService.GetEstadoRele(dispositivoId);
+            if (!result.IsSuccess) return NotFound(result);
             return Ok(result);
         }
     }
 
     public class ToggleRelayRequest
     {
+        public int CanalId { get; set; }
         public bool ReleActivo { get; set; }
     }
 }

@@ -33,7 +33,7 @@ namespace api_powergate.Aplication.Services
                    })
                    .ToListAsync();
 
-                if (canal == null)
+                if (canal == null || canal.Count == 0)
                 {
                     response.IsSuccess = false;
                     response.Message = "No se encontró el canal de carga.";
