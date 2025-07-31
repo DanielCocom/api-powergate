@@ -143,13 +143,13 @@ Obtiene todas las lecturas registradas.
 }
 ```
 
-# API PowerGate
 
-Esta API permite gestionar dispositivos (ESP32) y sus canales de carga, obtener lecturas, cambiar el estado de relés y consultar el estado actual de los dispositivos.  
 
 ---
 
 ## 📡 **WebSocket (SignalR)**
+
+Conectarse al websockect con la siguiente url
 
 **URL:*https://api-powergate.onrender.com/ws/deviceHub?deviceId=1*  
 
