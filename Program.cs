@@ -1,3 +1,5 @@
+// Program.cs
+
 using api_powergate.Infrastructure.Data;
 using api_powergate.Infrastructure.DependencyInjection;
 using api_powergate.Infrastructure.Realtime;
@@ -6,7 +8,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuración de ForwardedHeaders para ngrok
+// Configuración de ForwardedHeaders para ngrok (y otros proxies/balanceadores de carga como los de Render)
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -17,13 +19,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// CORS ajustado para ngrok
+// CORS ajustado para permitir tu frontend local y, si tuvieras, tu frontend publicado
 builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAll", policy => {
+    options.AddPolicy("AllowSpecificOrigins", policy => { // Cambié el nombre de la política a algo más específico
         policy.WithOrigins(
-                "https://*.ngrok-free.app", // Todos los subdominios ngrok
-    "http://localhost:*", // Cualquier puerto local
-    "https://localhost:*"
+                "http://127.0.0.1:5500", // <-- ¡AÑADIDO! Tu origen de desarrollo local
+                "https://api-powergate.onrender.com", // <-- Opcional, pero buena práctica si el frontend está en el mismo dominio o subdominio
+                "https://*.ngrok-free.app", // Para pruebas con ngrok
+                "http://localhost:*", // Para desarrollo local
+                "https://localhost:*" // Para desarrollo local
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
@@ -42,7 +46,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection(); // Opcional: Comenta si usas ngrok con HTTPS
-app.UseCors("AllowAll"); // ¡Antes de UseAuthorization!
+app.UseCors("AllowSpecificOrigins"); // ¡Asegúrate de usar el nombre de la política que definiste!
 app.UseAuthentication();
 app.UseAuthorization();
 
