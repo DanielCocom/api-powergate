@@ -142,3 +142,85 @@ Obtiene todas las lecturas registradas.
   "message": "Descripción del resultado"
 }
 ```
+
+# API PowerGate
+
+Esta API permite gestionar dispositivos (ESP32) y sus canales de carga, obtener lecturas, cambiar el estado de relés y consultar el estado actual de los dispositivos.  
+
+---
+
+## 📡 **WebSocket (SignalR)**
+
+**URL:*https://api-powergate.onrender.com/ws/deviceHub?deviceId=1*  
+
+
+**Descripción:**  
+El WebSocket mantiene la conexión en tiempo real con el dispositivo o cliente frontend.  
+- Cada dispositivo se conecta usando su `deviceId`.
+- El servidor puede enviar comandos al dispositivo (ej. activar/desactivar relé).
+- El dispositivo puede devolver confirmaciones (`ACK`) o enviar telemetría.
+
+**Eventos:**
+- **RelayCommand:** Comando que envía el servidor para activar/desactivar un relé.  
+  ```json
+  {
+    "type": "relay.toggle",
+    "commandId": "string",
+    "canalId": 1,
+    "state": true
+  }
+```
+```
+
+### `POST /api/Canal/rele`
+cambia el estado de un rele(Canal de carga) usar de momento canalId 1.
+
+**Parámetros**: Ninguno
+
+**request:**
+```json
+{
+  "canalId": 0,
+  "releActivo": true
+}
+```
+
+**response:**
+```json
+{
+  "isSuccess": true,
+  "message": "Comando enviado al dispositivo",
+  "data": "commandId"
+}
+
+```
+
+### ` Get /api/Canal/{dispositivoId}/estado`
+Obtiene los estados de los canales (reles) del dispositivo
+
+**Parámetros**: dispositivoId USAR EL NUMERO 1 
+
+
+
+**response:**
+```json
+{
+  "data": [
+    {
+      "nombre": "Canal A1",
+      "releActivo": false
+    },
+    {
+      "nombre": "Canal A2",
+      "releActivo": true
+    }
+  ],
+  "isSuccess": true,
+  "message": "Estado del rele obtenido correctamente."
+}
+```
+
+
+
+
+
