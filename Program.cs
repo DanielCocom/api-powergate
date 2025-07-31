@@ -24,9 +24,10 @@ builder.Services.AddCors(options => {
     options.AddPolicy("AllowSpecificOrigins", policy => { // Cambié el nombre de la política a algo más específico
         policy.WithOrigins(
                 "http://127.0.0.1:5500", // <-- ¡AÑADIDO! Tu origen de desarrollo local
+                  "http://127.0.0.1:5173", // <-- ¡AÑADIDO! Tu origen de desarrollo local
                 "https://api-powergate.onrender.com", // <-- Opcional, pero buena práctica si el frontend está en el mismo dominio o subdominio
                 "https://*.ngrok-free.app", // Para pruebas con ngrok
-                "http://localhost:*", // Para desarrollo local
+                "http://localhost:5173", // Para desarrollo local
                 "https://localhost:*" // Para desarrollo local
             )
             .AllowAnyHeader()

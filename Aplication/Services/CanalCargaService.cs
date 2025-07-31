@@ -18,16 +18,17 @@ namespace api_powergate.Aplication.Services
             _relayCommander = relayCommander;
             _connTracker = connTracker ?? throw new ArgumentNullException(nameof(connTracker));
         }
-        public async Task<Response<List<CanalCargaEstadoDto>>> GetEstadoRele(int id_dispositivo)
+        public async Task<Response<List<CanalEstadoDto>>> GetEstadoRele(int id_dispositivo)
         {
-            Response<List<CanalCargaEstadoDto>> response = new Response<List<CanalCargaEstadoDto>>();
+            Response<List<CanalEstadoDto>> response = new Response<List<CanalEstadoDto>>();
 
             try
             {
                 var canal = await _context.CanalDeCargas
                    .Where(c => c.DispositivoId == id_dispositivo)
-                   .Select(c => new CanalCargaEstadoDto
+                   .Select(c => new CanalEstadoDto
                    {
+                       CanalId = c.Id,
                        Nombre = c.Nombre,
                        ReleActivo = c.Habilitado
                    })
@@ -54,14 +55,15 @@ namespace api_powergate.Aplication.Services
 
         }
 
-        public async Task<Response<bool>> CambiarEstadoRele(int canalId, bool estado)
+        public async Task<Response<CanalEstadoDto>> CambiarEstadoRele(int canalId, bool estado)
         {
-            Response<bool> response = new Response<bool>();
+            Response<CanalEstadoDto> response = new Response<CanalEstadoDto>();
             try
             {
                 var canal = await _context.CanalDeCargas.FindAsync(canalId);
                 if (canal == null)
                 {
+                    response.Data = null;
                     response.IsSuccess = false;
                     response.Message = "Canal no encontrado.";
                     return response;
@@ -80,6 +82,12 @@ namespace api_powergate.Aplication.Services
                     await _relayCommander.SendToggleAsync(canal.DispositivoId, canal.Id, estado, Guid.NewGuid().ToString());
 
                 }
+                response.Data = new CanalEstadoDto
+                {
+                    CanalId = canal.Id,
+                    Nombre = canal.Nombre,
+                    ReleActivo = canal.Habilitado
+                };
 
                 response.IsSuccess = true;
                 response.Message = "Estado del rele actualizado correctamente.";

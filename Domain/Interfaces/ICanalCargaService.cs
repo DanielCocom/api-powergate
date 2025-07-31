@@ -5,6 +5,6 @@ namespace api_powergate.Domain.Interfaces
 {
     public interface ICanalCargaService
     {
-        Task<Response<List<CanalCargaEstadoDto>>> GetEstadoRele(int id_dispositivo);
+        Task<Response<List<CanalEstadoDto>>> GetEstadoRele(int id_dispositivo);
     }
 }
