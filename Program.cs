@@ -26,16 +26,16 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigins", policy =>
     {
         policy.WithOrigins(
-            "http://localhost:5173",
-            "http://127.0.0.1:5000",
-            "http://127.0.0.1:5173",
-            "https://127.0.0.1:5173",
-            "http://632af3c18b8b.ngrok-free.app",
-            "https://3b423adeb4d0.ngrok-free.app"
-        )
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials();
+                "http://127.0.0.1:5500", // <-- ¡AÑADIDO! Tu origen de desarrollo local
+                  "http://127.0.0.1:5173", // <-- ¡AÑADIDO! Tu origen de desarrollo local
+                "https://api-powergate.onrender.com", // <-- Opcional, pero buena práctica si el frontend está en el mismo dominio o subdominio
+                "https://*.ngrok-free.app", // Para pruebas con ngrok
+                "http://localhost:5173", // Para desarrollo local
+                "https://localhost:*" // Para desarrollo local
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // Obligatorio para SignalR
     });
 });
 
