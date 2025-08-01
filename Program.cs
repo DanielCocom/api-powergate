@@ -24,13 +24,14 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowSpecificOrigins", policy => { // Cambié el nombre de la política a algo más específico
         policy.WithOrigins(
-                "http://127.0.0.1:5500", // <-- ¡AÑADIDO! Tu origen de desarrollo local
-                  "http://127.0.0.1:5173", // <-- ¡AÑADIDO! Tu origen de desarrollo local
-                "https://api-powergate.onrender.com", // <-- Opcional, pero buena práctica si el frontend está en el mismo dominio o subdominio
-                "https://*.ngrok-free.app", // Para pruebas con ngrok
-                "http://localhost:5173", // Para desarrollo local
-                "https://localhost:*" // Para desarrollo local
-            )
+                       "http://127.0.0.1:5500", // <-- ¡AÑADIDO! Tu origen de desarrollo local
+                       "http://127.0.0.1:5173", // <-- ¡AÑADIDO! Tu origen de desarrollo local
+                       "https://api-powergate.onrender.com", // <-- Opcional, pero buena práctica si el frontend está en el mismo dominio o subdominio
+                       "https://*.ngrok-free.app", // Para pruebas con ngrok
+                       "http://127.0.0:*", // Para desarrollo local
+                       "https://localhost:*", // Para desarrollo local
+                       "http://*:*" // <-- ¡AÑADIDO! Escuchar desde todos los puertos
+                   )
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials(); // Obligatorio para SignalR
@@ -53,8 +54,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-app.UseWebSockets(); // Habilita WebSockets
-
+app.UseWebSockets(new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromSeconds(60), // Envía un ping cada 60 segundos si no hay actividad
+    // Puedes ajustar este valor
+});
 // Configura el endpoint para ESP32
 app.Use(async (context, next) =>
 {
