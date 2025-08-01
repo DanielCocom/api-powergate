@@ -5,6 +5,9 @@ using api_powergate.Domain.Interfaces.ws;
 using api_powergate.Infrastructure.Data;
 using api_powergate.Infrastructure.Realtime;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using WebSocketManager = api_powergate.Infrastructure.Realtime.WebSocketManager;
+
 
 namespace api_powergate.Aplication.Services
 {
@@ -14,9 +17,11 @@ namespace api_powergate.Aplication.Services
         private IDeviceConnectionTracker _connTracker;
         private IRelayCommander _relayCommander;
         private readonly Esp32WebSocketManager _wsManager;
-        public CanalCargaService(ApiPowergateContext apiPowergateContext, IRelayCommander relayCommander, IDeviceConnectionTracker connTracker, Esp32WebSocketManager esp32WebSocketManager)
+        private readonly WebSocketManager _webSocketManager;
+        public CanalCargaService(ApiPowergateContext apiPowergateContext, IRelayCommander relayCommander, IDeviceConnectionTracker connTracker, Esp32WebSocketManager esp32WebSocketManager, WebSocketManager webSocketManager)
         {
             _context = apiPowergateContext ?? throw new ArgumentNullException(nameof(apiPowergateContext));
+            _webSocketManager = webSocketManager;
             _relayCommander = relayCommander;
             _connTracker = connTracker ?? throw new ArgumentNullException(nameof(connTracker));
             _wsManager = esp32WebSocketManager ?? throw new ArgumentNullException(nameof(esp32WebSocketManager));
@@ -91,11 +96,25 @@ namespace api_powergate.Aplication.Services
                         estado,
                         commandId);
 
-                    // Registrar comando
-
-
                     await _context.SaveChangesAsync();
                 }
+
+                // Notificar a los clientes web suscritos al canal
+             
+                //Mensaje que se envia
+                var notification = new
+                {
+                    type = "canal_estado",
+                    canalId = canal.Id,
+                    nombre = canal.Nombre,
+                    releActivo = canal.Habilitado,
+                    mensaje = estado ? "Canal encendido" : "Canal apagado",
+                    timestamp = DateTime.UtcNow
+                };
+                await _webSocketManager.BroadcastToDeviceSubscribers(
+                    canal.Id.ToString(),
+                    JsonSerializer.Serialize(notification)
+                );
 
                 response.Data = new CanalEstadoDto
                 {

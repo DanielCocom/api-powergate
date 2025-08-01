@@ -33,10 +33,8 @@ namespace api_powergate.Infrastructure.Realtime
                 Console.WriteLine($"Error al conectar: {ex.Message}");
                 // Manejo adicional de la excepción si es necesario
             }
-
             await base.OnConnectedAsync();
         }
-
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             // Si guardas deviceId ↔ connectionId, puedes removerlo aquí
@@ -47,6 +45,7 @@ namespace api_powergate.Infrastructure.Realtime
         {
             return $"device-{deviceId}";
         }
+
 
         // “From device” → el ESP32 puede reportar su estado/lectura
         public async Task DeviceAck(string commandId, bool ok)

@@ -8,5 +8,6 @@ namespace api_powergate.Domain.Interfaces.ws
         Task MarkDisconnectedAsync(int dispositivoid, string connectionId);
         Task<bool> IsOnlineAsync(int dispositivoid);
         Task<List<string>> GetConnectionAsync(int dispositivoid, string connectionId);
+
     }
 }

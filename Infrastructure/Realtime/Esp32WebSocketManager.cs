@@ -101,6 +101,10 @@ namespace api_powergate.Infrastructure.Realtime
         {
             return Task.FromResult(_sockets.ContainsKey(dispositivoId.ToString()));
         }
+        public bool IsDeviceOnline(string deviceId)
+        {
+            return _sockets.ContainsKey(deviceId);
+        }
 
         private async Task HandleDisconnection(string deviceId)
         {
@@ -160,7 +164,7 @@ namespace api_powergate.Infrastructure.Realtime
                         case "telemetry":
                             var voltios = root.GetProperty("voltios").GetDouble();
                             var amperios = root.GetProperty("amperios").GetDouble();
-                            var vatios = voltios * amperios; // Cálculo básico de potencia
+                            var vatios = root.GetProperty("vatios").GetDouble(); // Cálculo básico de potencia
 
                             await _webManager.BroadcastToDeviceSubscribers(
                                 deviceId,
